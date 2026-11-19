@@ -163,6 +163,7 @@ def test_submit_order_table_number(monkeypatch):
     monkeypatch.setattr(core, "airtable_request", lambda m, u, **k: calls.append(k) or Resp(200, {"id": "r"}))
     core.submit_order("Masada", "A", "-", 7, None, [{**item(), "quantity": 1}])
     assert calls[0]["json"]["fields"]["Table Number"] == 7
+    assert "Phone" not in calls[0]["json"]["fields"]            # masada telefon yoxdur: "-" göndərilmir
 
 
 def test_submit_order_rolls_back_when_items_fail(monkeypatch):

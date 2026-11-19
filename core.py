@@ -218,7 +218,9 @@ def submit_order(order_type, customer_name, phone, table_number, delivery_addres
         logger.error("Boş səbətlə sifariş göndərilə bilməz.")
         return False, None
 
-    order_fields = {"Order Type": order_type, "Customer Name": customer_name, "Phone": phone, "Status": "Yeni"}
+    order_fields = {"Order Type": order_type, "Customer Name": customer_name, "Status": "Yeni"}
+    if phone and phone != "-":                       # Phone sahəsi "phoneNumber" tipindədir: "-" göndərmirik
+        order_fields["Phone"] = phone
     if table_number is not None:
         order_fields["Table Number"] = int(table_number)
     if delivery_address:
