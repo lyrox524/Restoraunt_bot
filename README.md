@@ -1,5 +1,5 @@
 # Restoran sifariş botu (Telegram + Airtable)
-[Tanıtım videosuna bax (brag.mp4)](https://github.com/lyrox524/Restoraunt_bot/blob/main/brag.mp4)
+[![Restoran sifariş botu tanıtım videosu](https://github.com/lyrox524/Restoraunt_bot/raw/main/brag.jpg)](https://github.com/lyrox524/Restoraunt_bot/blob/main/brag.mp4)
 
 Müştəri menyudan seçir, səbət yığır, **masada** və ya **çatdırılma** sifarişi verir. Sifariş Airtable-a yazılır və
 **restoranın Telegram qrupuna dərhal bildiriş gedir**.
