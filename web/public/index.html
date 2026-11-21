@@ -1,0 +1,320 @@
+<!doctype html>
+<html lang="az">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0c1f1a">
+<title>Menyu və sifariş</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;600;700&family=Source+Serif+4:opsz,wght@8..60,500;8..60,700&display=swap&subset=latin-ext" rel="stylesheet">
+<style>
+:root{
+  --ink:#0c1f1a; --green:#1f5c47; --green-2:#2b7a5f; --cream:#f3eddc; --paper:#fbf8ef;
+  --gold:#d9a64a; --gold-ink:#7a5410; --line:#d9d1ba; --muted:#5d6a63; --err:#a3281f;
+  --serif:'Source Serif 4',Georgia,'Times New Roman',serif;
+  --sans:'Source Sans 3',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--paper);color:var(--ink);font:400 16px/1.45 var(--sans);padding-bottom:calc(88px + env(safe-area-inset-bottom))}
+button,input,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+[hidden]{display:none!important}
+
+/* üst hissə: restoran adı + masa nişanı */
+.top{background:var(--ink);color:var(--cream);padding:28px 16px 22px}
+.top-in{max-width:640px;margin:0 auto}
+.rest{font:700 28px/1.1 var(--serif);margin:0;letter-spacing:.2px}
+.sub{margin:6px 0 0;color:#b9c7bf;font-size:15px}
+.chip{display:none;margin-top:18px;align-items:center;gap:14px;border:1.5px solid var(--gold);border-radius:14px;padding:10px 16px 10px 12px;width:max-content;max-width:100%}
+.chip.on{display:flex}
+.chip b{font:700 44px/1 var(--serif);color:var(--gold);min-width:1.2ch;text-align:center}
+.chip span{font-size:14px;line-height:1.25;color:var(--cream)}
+.chip span i{display:block;font-style:normal;color:#b9c7bf}
+
+/* kateqoriya zolağı */
+.cats{position:sticky;top:0;z-index:5;background:var(--paper);border-bottom:1px solid var(--line)}
+.cats-in{max-width:640px;margin:0 auto;display:flex;gap:8px;overflow-x:auto;padding:10px 16px;scrollbar-width:none}
+.cats-in::-webkit-scrollbar{display:none}
+.cat{flex:none;border:1px solid var(--line);background:transparent;border-radius:999px;padding:8px 16px;font-weight:600;font-size:15px;min-height:40px}
+.cat[aria-current=true]{background:var(--green);border-color:var(--green);color:var(--cream)}
+
+main{max-width:640px;margin:0 auto;padding:0 16px}
+.sec{padding-top:26px;scroll-margin-top:64px}
+.sec h2{font:700 24px/1.2 var(--serif);margin:0 0 6px;color:var(--green)}
+.item{display:grid;grid-template-columns:1fr auto;gap:4px 14px;padding:14px 0;border-bottom:1px solid var(--line)}
+.item.has-photo{grid-template-columns:76px 1fr auto}
+.ph{width:76px;height:76px;border-radius:10px;object-fit:cover;background:var(--cream)}
+.nm{font:600 17px/1.25 var(--serif);margin:0}
+.nm .star{color:var(--gold-ink);font-size:13px;font-family:var(--sans);font-weight:600;margin-left:6px}
+.ds{margin:3px 0 0;font-size:14px;color:var(--muted)}
+.tg{margin:4px 0 0;font-size:13px;color:var(--green-2)}
+.pr{font:700 17px/1.25 var(--serif);white-space:nowrap;text-align:right}
+.ctl{grid-column:-2/-1;justify-self:end;align-self:end}
+.add{border:1.5px solid var(--green);background:transparent;color:var(--green);border-radius:999px;font-weight:700;min-height:44px;padding:0 20px}
+.step{display:inline-flex;align-items:center;background:var(--green);color:var(--cream);border-radius:999px}
+.step button{width:44px;height:44px;border:0;background:transparent;color:inherit;font-size:22px;font-weight:700;border-radius:999px}
+.step output{min-width:24px;text-align:center;font-weight:700}
+
+/* səbət zolağı */
+.bar{position:fixed;left:0;right:0;bottom:0;z-index:10;padding:10px 16px calc(10px + env(safe-area-inset-bottom));background:linear-gradient(to top,var(--paper) 70%,transparent)}
+.bar button{display:flex;justify-content:space-between;align-items:center;width:100%;max-width:640px;margin:0 auto;border:0;border-radius:14px;background:var(--ink);color:var(--cream);padding:0 18px;min-height:56px;font-weight:700;font-size:17px;box-shadow:0 6px 20px rgba(12,31,26,.28)}
+.bar .n{background:var(--gold);color:var(--ink);border-radius:999px;min-width:28px;height:28px;display:inline-grid;place-items:center;margin-right:10px;font-size:15px}
+
+/* sifariş pəncərəsi */
+.shade{position:fixed;inset:0;background:rgba(12,31,26,.55);z-index:20}
+.sheet{position:fixed;left:0;right:0;bottom:0;z-index:21;max-height:92dvh;overflow:auto;background:var(--paper);border-radius:20px 20px 0 0;padding:20px 16px calc(24px + env(safe-area-inset-bottom));animation:up .22s ease-out}
+@keyframes up{from{transform:translateY(24px)}to{transform:none}}
+.sheet-in{max-width:640px;margin:0 auto}
+.sheet h3{font:700 24px/1.2 var(--serif);margin:0 0 4px}
+.x{float:right;border:0;background:transparent;font-size:28px;line-height:1;min-width:44px;min-height:44px;margin:-8px -8px 0 0}
+.line{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px dotted var(--line)}
+.line .l{flex:1}
+.line .l small{display:block;color:var(--muted)}
+.line .step{background:var(--cream);color:var(--ink)}
+.total{display:flex;justify-content:space-between;font:700 20px/1 var(--serif);padding:16px 0 4px}
+.types{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;gap:6px;margin:18px 0 6px;background:var(--cream);padding:4px;border-radius:12px}
+.types button{border:0;background:transparent;border-radius:9px;min-height:44px;font-weight:600;font-size:15px}
+.types button[aria-pressed=true]{background:var(--green);color:var(--cream)}
+label{display:block;margin-top:14px;font-weight:600;font-size:15px}
+input,textarea{display:block;width:100%;margin-top:6px;border:1.5px solid var(--line);border-radius:10px;background:#fff;padding:12px;min-height:48px;font-size:16px}
+textarea{min-height:72px;resize:vertical}
+input:focus,textarea:focus{border-color:var(--green);outline:none;box-shadow:0 0 0 3px rgba(31,92,71,.2)}
+.hp{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
+.err{margin:14px 0 0;padding:10px 12px;border-radius:10px;background:#fbe9e6;color:var(--err);font-weight:600}
+.go{margin-top:18px;width:100%;border:0;border-radius:14px;background:var(--green);color:var(--cream);min-height:56px;font-weight:700;font-size:18px}
+.go[disabled]{opacity:.6}
+.pay{margin:10px 0 0;color:var(--muted);font-size:14px;text-align:center}
+.done{text-align:center;padding:30px 0 10px}
+.done .no{font:700 64px/1 var(--serif);color:var(--green);margin:10px 0}
+.done p{margin:6px 0}
+.link{border:0;background:none;color:var(--green);font-weight:700;text-decoration:underline;min-height:44px}
+.state{max-width:640px;margin:0 auto;padding:40px 16px;text-align:center;color:var(--muted)}
+.state button{margin-top:12px;border:1.5px solid var(--green);background:transparent;color:var(--green);border-radius:999px;padding:0 22px;min-height:44px;font-weight:700}
+.sk{height:64px;margin:14px 0;border-radius:10px;background:linear-gradient(90deg,var(--cream),#fff,var(--cream));background-size:200% 100%;animation:sh 1.2s linear infinite}
+@keyframes sh{to{background-position:-200% 0}}
+@media (prefers-reduced-motion:reduce){.sheet,.sk{animation:none}html{scroll-behavior:auto}}
+html{scroll-behavior:smooth}
+</style>
+</head>
+<body>
+<header class="top"><div class="top-in">
+  <h1 class="rest" id="rest">Menyu</h1>
+  <p class="sub" id="sub">Menyuya baxın, sifariş verin</p>
+  <div class="chip" id="chip"><b id="tno"></b><span>Masa<i>Sifariş bu masaya gələcək</i></span></div>
+</div></header>
+
+<nav class="cats" id="cats" aria-label="Kateqoriyalar" hidden><div class="cats-in" id="catsIn"></div></nav>
+<main id="main"><div class="sk"></div><div class="sk"></div><div class="sk"></div></main>
+
+<div class="bar" id="bar" hidden><button id="open" type="button"><span><span class="n" id="cnt">0</span>Səbətə bax</span><span id="sum">0</span></button></div>
+
+<div class="shade" id="shade" hidden></div>
+<section class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sheetT" hidden><div class="sheet-in" id="sheetIn"></div></section>
+
+<script>
+(() => {
+  'use strict';
+  const $ = (id) => document.getElementById(id);
+  const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const qs = new URLSearchParams(location.search);
+  const tableParam = parseInt(qs.get('t'), 10);
+  const TABLE = Number.isInteger(tableParam) && tableParam >= 1 && tableParam <= 999 ? tableParam : null;
+  const SIG = qs.get('s') || '';
+  const store = {
+    get(k, d) { try { return JSON.parse(localStorage.getItem(k)) ?? d; } catch { return d; } },
+    set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} },
+    del(k) { try { localStorage.removeItem(k); } catch {} },
+  };
+  const CART_KEY = 'sg_cart';
+  let menu = null, cfg = {}, items = new Map(), cart = store.get(CART_KEY, {}), type = TABLE ? 'Masada' : null;
+  let form = store.get('sg_form', {}), attemptKey = null, busy = false, error = '', done = null;
+  if (typeof cart !== 'object' || Array.isArray(cart)) cart = {};
+
+  const money = (n) => `${(Math.round(n * 100) / 100).toFixed(2)} ${cfg.currency || 'AZN'}`;
+  const qty = (id) => cart[id] || 0;
+  const count = () => Object.values(cart).reduce((a, b) => a + b, 0);
+  const total = () => Object.entries(cart).reduce((s, [id, q]) => s + (items.get(id)?.price || 0) * q, 0);
+  const saveCart = () => store.set(CART_KEY, cart);
+
+  function setQty(id, q) {
+    q = Math.max(0, Math.min(20, q));
+    if (q) cart[id] = q; else delete cart[id];
+    attemptKey = null;
+    saveCart(); renderAll();
+  }
+
+  // ---------- menyu
+  async function load() {
+    try {
+      const r = await fetch('/api/menu');
+      const j = await r.json();
+      if (!r.ok || !j.ok) throw new Error();
+      cfg = j; menu = j.categories;
+      items = new Map(menu.flatMap((c) => c.items.map((i) => [i.id, i])));
+      for (const id of Object.keys(cart)) if (!items.has(id)) delete cart[id];   // artıq olmayan məhsullar
+      saveCart();
+      if (j.restaurant) { $('rest').textContent = j.restaurant; document.title = `${j.restaurant} · Menyu`; }
+      if (TABLE) { $('tno').textContent = TABLE; $('chip').classList.add('on'); $('sub').textContent = 'Menyudan seçin, sifariş birbaşa mətbəxə gedir'; }
+      if (!TABLE && !j.delivery && !j.pickup) { type = null; }
+      if (!type) type = j.pickup !== false ? 'Özü götürür' : (j.delivery !== false ? 'Çatdırılma' : null);
+      renderAll();
+    } catch {
+      $('main').innerHTML = '<div class="state"><p><b>Menyu yüklənmədi.</b><br>İnternet əlaqəsini yoxlayın və yenidən cəhd edin.</p><button type="button" id="retry">Yenidən yüklə</button></div>';
+      $('retry').onclick = () => { $('main').innerHTML = '<div class="sk"></div><div class="sk"></div>'; load(); };
+    }
+  }
+
+  function renderMenu() {
+    if (!menu.length) { $('main').innerHTML = '<div class="state"><p>Menyu hələ doldurulmayıb.</p></div>'; $('cats').hidden = true; return; }
+    $('catsIn').innerHTML = menu.map((c, i) => `<button class="cat" type="button" data-c="${i}" aria-current="${i === 0}">${esc(c.name)}</button>`).join('');
+    $('cats').hidden = menu.length < 2;
+    $('main').innerHTML = menu.map((c, i) => `<section class="sec" id="c${i}"><h2>${esc(c.name)}</h2>${c.items.map(row).join('')}</section>`).join('');
+  }
+  const row = (it) => {
+    const q = qty(it.id);
+    return `<article class="item${it.photo ? ' has-photo' : ''}" data-id="${it.id}">
+      ${it.photo ? `<img class="ph" src="${esc(it.photo)}" alt="" loading="lazy" width="76" height="76">` : ''}
+      <div><h3 class="nm">${esc(it.name)}${it.featured ? '<span class="star">Tövsiyə</span>' : ''}</h3>
+        ${it.description ? `<p class="ds">${esc(it.description)}</p>` : ''}
+        ${it.tags.length ? `<p class="tg">${esc(it.tags.join(', '))}</p>` : ''}</div>
+      <div class="pr">${esc(money(it.price))}</div>
+      <div class="ctl">${q ? stepper(it.id, q, it.name) : `<button class="add" type="button" data-add="${it.id}" aria-label="${esc(it.name)} əlavə et">Əlavə et</button>`}</div>
+    </article>`;
+  };
+  const stepper = (id, q, name) => `<span class="step"><button type="button" data-dec="${id}" aria-label="${esc(name)} azalt">−</button><output aria-live="polite">${q}</output><button type="button" data-inc="${id}" aria-label="${esc(name)} artır">+</button></span>`;
+
+  function renderBar() {
+    const n = count();
+    $('bar').hidden = n === 0 || !!done;
+    $('cnt').textContent = n;
+    $('sum').textContent = money(total());
+  }
+
+  // ---------- sifariş pəncərəsi
+  function typeOptions() {
+    const t = [];
+    if (TABLE) t.push(['Masada', 'Masada']);
+    if (cfg.pickup !== false) t.push(['Özü götürür', 'Özüm götürəcəyəm']);
+    if (cfg.delivery !== false) t.push(['Çatdırılma', 'Çatdırılma']);
+    return t;
+  }
+  function openSheet() { $('shade').hidden = false; $('sheet').hidden = false; document.body.style.overflow = 'hidden'; renderSheet(); }
+  function closeSheet() {
+    $('shade').hidden = true; $('sheet').hidden = true; document.body.style.overflow = '';
+    if (done) { done = null; renderAll(); }
+  }
+  function renderSheet() {
+    if ($('sheet').hidden) return;
+    const el = $('sheetIn');
+    if (done) {
+      el.innerHTML = `<div class="done"><button class="x" type="button" data-close aria-label="Bağla">×</button>
+        <h3 id="sheetT">Sifariş qəbul olundu</h3>
+        <div class="no">${done.orderNumber ? '№' + esc(done.orderNumber) : '✓'}</div>
+        <p>${type === 'Masada' ? `Sifarişiniz ${TABLE} nömrəli masaya hazırlanır.` : 'Sizinlə telefonla əlaqə saxlanılacaq.'}</p>
+        <p><b>${esc(money(done.total))}</b></p>
+        ${done.notified === false ? '<p class="pay">Mətbəxə bildiriş gecikə bilər. Zəhmət olmasa işçiyə xəbər verin.</p>' : ''}
+        <button class="link" type="button" data-close>Menyuya qayıt</button></div>`;
+      el.querySelector('[data-close]').focus();
+      return;
+    }
+    const lines = Object.entries(cart).filter(([id]) => items.has(id)).map(([id, q]) => {
+      const it = items.get(id);
+      return `<div class="line"><div class="l">${esc(it.name)}<small>${esc(money(it.price))}</small></div>${stepper(id, q, it.name)}</div>`;
+    }).join('');
+    const opts = typeOptions();
+    const needContact = type !== 'Masada';
+    el.innerHTML = `<button class="x" type="button" data-close aria-label="Bağla">×</button>
+      <h3 id="sheetT">Sifarişiniz</h3>${lines || '<p class="ds">Səbət boşdur. Menyudan məhsul seçin.</p>'}
+      <div class="total"><span>Cəmi</span><span>${esc(money(total()))}</span></div>
+      ${opts.length > 1 ? `<div class="types" role="group" aria-label="Sifariş növü">${opts.map(([v, l]) => `<button type="button" data-type="${v}" aria-pressed="${type === v}">${l}</button>`).join('')}</div>` : ''}
+      <form id="f" novalidate>
+        ${needContact ? `<label>Ad və soyad<input name="name" autocomplete="name" value="${esc(form.name)}" required></label>
+        <label>Telefon<input name="phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="050 123 45 67" value="${esc(form.phone)}" required></label>` : ''}
+        ${type === 'Çatdırılma' ? `<label>Ünvan<textarea name="address" autocomplete="street-address" placeholder="Küçə, bina, mənzil" required>${esc(form.address)}</textarea></label>` : ''}
+        <label>Qeyd (istəyə bağlı)<textarea name="note" maxlength="300" placeholder="Məsələn: acısız olsun">${esc(form.note)}</textarea></label>
+        <div class="hp" aria-hidden="true"><label>Sayt<input name="website" tabindex="-1" autocomplete="off"></label></div>
+        ${error ? `<p class="err" role="alert">${esc(error)}</p>` : ''}
+        <button class="go" type="submit" ${busy || !lines ? 'disabled' : ''}>${busy ? 'Göndərilir…' : 'Sifarişi göndər'}</button>
+        <p class="pay">Ödəniş ${type === 'Masada' ? 'sifariş gələndə masada' : type === 'Çatdırılma' ? 'çatdırılma zamanı' : 'götürərkən'} edilir.</p>
+      </form>`;
+  }
+
+  function readForm() {
+    const f = $('f'); if (!f) return;
+    for (const k of ['name', 'phone', 'address', 'note']) if (f.elements[k]) form[k] = f.elements[k].value;
+    store.set('sg_form', { name: form.name, phone: form.phone, address: form.address });
+  }
+
+  async function submit() {
+    readForm();
+    error = '';
+    if (busy) return;
+    const lines = Object.entries(cart).map(([id, q]) => ({ id, qty: q }));
+    if (!lines.length) return;
+    if (type !== 'Masada') {
+      if ((form.name || '').trim().length < 2) { error = 'Ad və soyadınızı daxil edin.'; return renderSheet(); }
+      if (!/^[+\d\s()\-]{7,20}$/.test((form.phone || '').trim()) || (form.phone || '').replace(/\D/g, '').length < 7) { error = 'Telefon nömrəsini düzgün daxil edin (məsələn: 050 123 45 67).'; return renderSheet(); }
+      if (type === 'Çatdırılma' && (form.address || '').trim().length < 5) { error = 'Tam ünvanı daxil edin.'; return renderSheet(); }
+    }
+    attemptKey = attemptKey || (crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.random().toString(16).slice(2)}`);
+    busy = true; renderSheet();
+    try {
+      const r = await fetch('/api/order', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ type, table: TABLE, sig: SIG, name: form.name, phone: form.phone, address: form.address, note: form.note, items: lines, key: attemptKey, website: $('f')?.elements.website?.value || '' }),
+      });
+      const j = await r.json().catch(() => ({}));
+      if (r.ok && j.ok) {
+        done = j; cart = {}; saveCart(); form.note = ''; attemptKey = null;
+      } else if (j.error === 'unavailable') {
+        error = j.message; attemptKey = null; await load();
+      } else if (j.error === 'bad_table_qr') {
+        error = 'Masa QR kodu etibarsızdır. Masadakı QR kodu yenidən oxudun.';
+      } else {
+        error = j.message || 'Sifariş göndərilmədi. Bir az sonra yenidən cəhd edin.';
+      }
+    } catch {
+      error = 'Əlaqə yoxdur. İnterneti yoxlayıb yenidən göndərin. Sifariş təkrarlanmayacaq.';   // eyni key saxlanılır
+    }
+    busy = false; renderAll();
+  }
+
+  function renderAll() { if (!menu) return; if (!done || $('main').children.length === 0) renderMenu(); renderBar(); renderSheet(); }
+
+  // ---------- hadisələr
+  document.addEventListener('click', (e) => {
+    const t = e.target.closest('button'); if (!t) return;
+    if (t.dataset.add) setQty(t.dataset.add, 1);
+    else if (t.dataset.inc) setQty(t.dataset.inc, qty(t.dataset.inc) + 1);
+    else if (t.dataset.dec) { readForm(); setQty(t.dataset.dec, qty(t.dataset.dec) - 1); }
+    else if (t.dataset.type) { readForm(); type = t.dataset.type; error = ''; renderSheet(); }
+    else if (t.dataset.c !== undefined) {
+      document.getElementById('c' + t.dataset.c)?.scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion:reduce)').matches ? 'auto' : 'smooth' });
+    }
+    else if (t.id === 'open') openSheet();
+    else if (t.hasAttribute('data-close')) closeSheet();
+  });
+  $('shade').onclick = closeSheet;
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !$('sheet').hidden) closeSheet(); });
+  document.addEventListener('submit', (e) => { e.preventDefault(); submit(); });
+  document.addEventListener('input', (e) => { if (e.target.closest('#f')) readForm(); });
+
+  // aktiv kateqoriya skroll zamanı
+  const io = 'IntersectionObserver' in window ? new IntersectionObserver((es) => {
+    for (const en of es) if (en.isIntersecting) {
+      const i = en.target.id.slice(1);
+      document.querySelectorAll('.cat').forEach((b) => b.setAttribute('aria-current', String(b.dataset.c === i)));
+      document.querySelector(`.cat[data-c="${i}"]`)?.scrollIntoView({ inline: 'center', block: 'nearest' });
+    }
+  }, { rootMargin: '-90px 0px -70% 0px' }) : null;
+  const _render = renderMenu;
+  renderMenu = function () { _render(); io && document.querySelectorAll('.sec').forEach((s) => io.observe(s)); };   // eslint-disable-line
+
+  load();
+})();
+</script>
+</body>
+</html>

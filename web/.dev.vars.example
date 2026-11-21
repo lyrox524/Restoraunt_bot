@@ -1,0 +1,6 @@
+# Lokal sınaq üçün (wrangler pages dev). Real açarları GitHub-a qoyma.
+AIRTABLE_TOKEN=
+AIRTABLE_BASE_ID=
+TELEGRAM_BOT_TOKEN=
+ADMIN_CHAT_ID=
+RESTAURANT_NAME=

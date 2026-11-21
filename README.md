@@ -3,7 +3,11 @@
 Müştəri menyudan seçir, səbət yığır, **masada** və ya **çatdırılma** sifarişi verir. Sifariş Airtable-a yazılır və
 **restoranın Telegram qrupuna dərhal bildiriş gedir**.
 
-## Quraşdırma
+## Veb versiya
+
+`web/` qovluğunda Telegram-sız variant var: masa QR → telefonda menyu → sifariş (Cloudflare Pages, pulsuz). Quraşdırma: [web/README.md](web/README.md).
+
+## Quraşdırma (Telegram bot)
 1. `pip install -r requirements.txt`
 2. `.env.example` → `.env` kopyala və doldur.
 3. `python bot.py`
